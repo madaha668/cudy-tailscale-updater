@@ -19,7 +19,7 @@ Secondly, the openwrt tailscale version is lagging far from the Tailscale offici
 * flash the CUDY router with the [intermediate openwrt firmware](https://drive.google.com/drive/folders/1BKVarlwlNxf7uJUtRhuMGUqeCa5KpMnj)
 * wait flash down and reboot
 * login the web UI of the intermediate openwrt
-* download the latest openwrt for cortex53
+* download the latest [openwrt for cortex53: TR3000 v1](https://downloads.openwrt.org/releases/24.10.2/targets/mediatek/filogic/openwrt-24.10.2-mediatek-filogic-cudy_tr3000-v1-squashfs-sysupgrade.bin)
 * BACKUP the partitions of the router following CUDY's suggestion!
 * flash it again with the latest openwrt binary
 * wait it to reboot and ssh login it after allset
