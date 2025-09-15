@@ -7,9 +7,10 @@
 # - Compare with current version
 # - Download if newer version available
 
-OWNER="Admonstrator"          
-REPO="glinet-tailscale-updater"
+OWNER="madaha668"
+REPO="openwrt-tailscale-updater"
 DOWNLOAD_DIR="/tmp/tailscale"
+VERSION_FILE="./version.txt"
 
 # Step 1: Check prerequisites
 check_prerequisites() {
@@ -52,8 +53,8 @@ get_latest_version() {
 
     # Download and extract version
     #echo $DOWNLOAD_URL
-    curl -s "$DOWNLOAD_URL"
-    LATEST_VERSION=$(cat version.txt| sed 's/^v//')
+    curl -s -L "$DOWNLOAD_URL" -o $VERSION_FILE
+    LATEST_VERSION=$(cat $VERSION_FILE| sed 's/^v//')
     #echo $LATEST_VERSION
     
     if [ -z "$LATEST_VERSION" ]; then

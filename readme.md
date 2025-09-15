@@ -7,7 +7,7 @@
 However its official router software doesn't contain tailscale application. Luckily the CUDY vendor provides the [approach](https://www.cudy.com/en-us/blogs/faq/openwrt-software-download) to re-flash the gears with openwrt, and I have just verified it with a TR3000 box (openwrt 24.10.2).
 
 ## Why this project matters
-Firstly, the root filesystem in TR3000 running openwrt is rather small(<50MB), openwrt official release of combined tailscale and tailscaled is around 20MB +, and Tailscale official arm64 release is even much bigger). To save the space, I need a more compact one.
+Firstly, the root filesystem in TR3000 running openwrt is rather small(<50MB), openwrt official release of combined tailscale and tailscaled is around 20MB +, and Tailscale official arm64 release is even much bigger. To save the space, I need a more compact one.
 
 Secondly, the openwrt tailscale version is lagging far from the Tailscale official. To keep the tailscale in CUDY router uptodate, it's necessary to construct a fresh version. 
 
