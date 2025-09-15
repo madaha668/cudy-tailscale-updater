@@ -13,10 +13,32 @@ Secondly, the openwrt tailscale version is lagging far from the Tailscale offici
 
 ## Install official openwrt for CUDY routers
 
+* the followings are based on CUDY *TR3000*
+* power on it
+* download the intermeidate openwrt by CUDY from google drive
+* flash the CUDY router with the intermediate openwrt firmware
+* wait flash down and reboot
+* login the web UI of the intermediate openwrt
+* download the latest openwrt for cortex53
+* BACKUP the partitions of the router following CUDY's suggestion!
+* flash it again with the latest openwrt binary
+* wait it to reboot and ssh login it after allset
+* some tweaks
+  * install some pkgs: curl, jq, bash and ip6tables
+  * install openwrt tailscale with opkg <---- we might have to skip the step in routers with very limited storage space like TR1200
+    * it might be necessary to construct all the configuration files for tailscale(d) to run, manually !!!
+  * wrap the wget with 'wget -4' if 'opkg update' failed for [this issue](https://www.reddit.com/r/openwrt/comments/1j7862n/wget_returned_4_failed_to_download_a_package/)
+  * run 'download-tiny\_tailscale.sh' to get the tiny tailscale(d) in /tmp/tailscale directory of the openwrt router
+  * stop tailscaled service if it's running
+  * replace the /usr/sbin/tailscaled with that in /tmp/tailscale/
+  * restart the tailscaled service
+* login the luci web UI
+* configure tailscale follwing the [guide](https://openwrt.org/docs/guide-user/services/vpn/tailscale/start) and up it!
+
 ## TODO
 To verify the work with TR1200.
 
-## Disclaimer
+## Disclaimer (copy from https://github.com/Admonstrator/glinet-tailscale-updater)
 This script is provided as is and without any warranty. Use it at your own risk.
 
 It may break your router, your computer, your network or anything else. It may even burn down your house.
