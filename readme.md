@@ -16,7 +16,7 @@ Secondly, the openwrt tailscale version is lagging far from the Tailscale offici
 * the followings are based on CUDY *TR3000*
 * power on it
 * download the intermeidate openwrt by CUDY from google drive
-* flash the CUDY router with the intermediate openwrt firmware
+* flash the CUDY router with the [intermediate openwrt firmware](https://drive.google.com/drive/folders/1BKVarlwlNxf7uJUtRhuMGUqeCa5KpMnj)
 * wait flash down and reboot
 * login the web UI of the intermediate openwrt
 * download the latest openwrt for cortex53
