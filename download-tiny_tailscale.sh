@@ -42,7 +42,7 @@ get_latest_version() {
     echo "Getting latest version..."
     
     # Get version.txt from latest release
-    DOWNLOAD_URL=$(curl -s "https://api.github.com/repos/${OWNER}/${REPO}/releases/latest" | \
+    DOWNLOAD_URL=$(curl -s -L "https://api.github.com/repos/${OWNER}/${REPO}/releases/latest" | \
       grep "browser_download_url.*version.txt" | \
       cut -d '"' -f 4)
 
@@ -116,7 +116,7 @@ check_and_download() {
     mkdir -p "$DOWNLOAD_DIR"
     
     # Get download URL for arm64 binary
-    BINARY_URL=$(curl -s "https://api.github.com/repos/${OWNER}/${REPO}/releases/latest" | \
+    BINARY_URL=$(curl -s -L "https://api.github.com/repos/${OWNER}/${REPO}/releases/latest" | \
         grep "browser_download_url.*tailscaled-linux-arm64" | \
         cut -d '"' -f 4)
     
