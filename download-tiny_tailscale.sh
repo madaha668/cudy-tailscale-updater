@@ -100,7 +100,7 @@ compare_versions() {
         fi
     done
 
-    if [ -z $DOWNLOAD_LATEST_VERSION ]; then
+    if [ $DOWNLOAD_LATEST_VERSION -eq 0 ]; then
         echo "Tailscale is up to date ($CURRENT_VERSION)"
         exit 0
     fi
