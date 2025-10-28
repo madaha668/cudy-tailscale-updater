@@ -132,7 +132,7 @@ main() {
     
     # Step 7: Restart service
     log "Restarting tailscaled service..."
-    if ! service tailscaled restart 2>/dev/null; then
+    if ! service tailscale restart 2>/dev/null; then
         error "Failed to restart tailscaled service"
     fi
     
