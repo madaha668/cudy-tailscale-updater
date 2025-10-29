@@ -153,7 +153,7 @@ get_latest_tailscale_version_tiny() {
     # Will attempt to download the latest version of tailscale from the updater repository
     # This is the default behavior
     log "INFO" "Detecting latest tiny tailscale version"
-    TAILSCALE_VERSION_NEW=$(curl -L -s $TAILSCALE_TINY_URL/version.txt | grep -o '[0-9]*\.[0-9]*\.[0-9]')
+    TAILSCALE_VERSION_NEW=$(curl -L -s ${PROXY:+--proxy "$PROXY"} $TAILSCALE_TINY_URL/version.txt | grep -o '[0-9]*\.[0-9]*\.[0-9]')
     if [ -z "$TAILSCALE_VERSION_NEW" ]; then
         log "ERROR" "Could not get latest tailscale version. Please check your internet connection."
         exit 1
@@ -169,7 +169,7 @@ get_latest_tailscale_version_tiny() {
     fi
     log "INFO" "The latest tailscale version is: $TAILSCALE_VERSION_NEW"
     log "INFO" "Downloading latest tailscale version"
-    curl -L -s --output /tmp/tailscaled-linux-$TINY_ARCH "$TAILSCALE_TINY_URL/tailscaled-linux-$TINY_ARCH"
+    curl -L -s ${PROXY:+--proxy "$PROXY"} --output /tmp/tailscaled-linux-$TINY_ARCH "$TAILSCALE_TINY_URL/tailscaled-linux-$TINY_ARCH"
     # Check if download was successful
     if [ ! -f "/tmp/tailscaled-linux-$TINY_ARCH" ]; then
         log "ERROR" "Could not download tailscale. Exiting"
@@ -190,13 +190,13 @@ get_latest_tailscale_version() {
     else
         log "INFO" "Detecting latest tailscale version"
         if [ "$ARCH" = "aarch64" ]; then
-            TAILSCALE_VERSION_NEW=$(curl -s https://pkgs.tailscale.com/stable/ | grep -o 'tailscale_[0-9]*\.[0-9]*\.[0-9]*_arm64\.tgz' | head -n 1)
+            TAILSCALE_VERSION_NEW=$(curl -s ${PROXY:+--proxy "$PROXY"} https://pkgs.tailscale.com/stable/ | grep -o 'tailscale_[0-9]*\.[0-9]*\.[0-9]*_arm64\.tgz' | head -n 1)
         elif [ "$ARCH" = "armv7l" ]; then
-            TAILSCALE_VERSION_NEW=$(curl -s https://pkgs.tailscale.com/stable/ | grep -o 'tailscale_[0-9]*\.[0-9]*\.[0-9]*_arm\.tgz' | head -n 1)
+            TAILSCALE_VERSION_NEW=$(curl -s ${PROXY:+--proxy "$PROXY"} https://pkgs.tailscale.com/stable/ | grep -o 'tailscale_[0-9]*\.[0-9]*\.[0-9]*_arm\.tgz' | head -n 1)
         elif [ "$ARCH" = "x86_64" ]; then
-            TAILSCALE_VERSION_NEW=$(curl -s https://pkgs.tailscale.com/stable/ | grep -o 'tailscale_[0-9]*\.[0-9]*\.[0-9]*_amd64\.tgz' | head -n 1)
+            TAILSCALE_VERSION_NEW=$(curl -s ${PROXY:+--proxy "$PROXY"} https://pkgs.tailscale.com/stable/ | grep -o 'tailscale_[0-9]*\.[0-9]*\.[0-9]*_amd64\.tgz' | head -n 1)
         elif [ "$ARCH" = "mips" ]; then
-            TAILSCALE_VERSION_NEW=$(curl -s https://pkgs.tailscale.com/stable/ | grep -o 'tailscale_[0-9]*\.[0-9]*\.[0-9]*_mips\.tgz' | head -n 1)
+            TAILSCALE_VERSION_NEW=$(curl -s ${PROXY:+--proxy "$PROXY"} https://pkgs.tailscale.com/stable/ | grep -o 'tailscale_[0-9]*\.[0-9]*\.[0-9]*_mips\.tgz' | head -n 1)
         fi
         if [ -z "$TAILSCALE_VERSION_NEW" ]; then
             log "ERROR" "Could not get latest tailscale version. Please check your internet connection."
@@ -209,7 +209,7 @@ get_latest_tailscale_version() {
         fi
         log "INFO" "The latest tailscale version is: $TAILSCALE_VERSION_NEW"
         log "INFO" "Downloading latest tailscale version"
-        curl -L -s --output /tmp/tailscale.tar.gz "https://pkgs.tailscale.com/stable/$TAILSCALE_VERSION_NEW"
+        curl -L -s ${PROXY:+--proxy "$PROXY"} --output /tmp/tailscale.tar.gz "https://pkgs.tailscale.com/stable/$TAILSCALE_VERSION_NEW"
         # Check if download was successful
     fi
     if [ ! -f "/tmp/tailscale.tar.gz" ]; then
@@ -266,7 +266,7 @@ compress_binaries() {
     fi
     log "INFO" "Getting UPX"
     upx_version="$(
-        curl -s "https://api.github.com/repos/upx/upx/releases/latest" |
+        curl -s ${PROXY:+--proxy "$PROXY"} "https://api.github.com/repos/upx/upx/releases/latest" |
             grep 'tag_name' |
             cut -d : -f 2 |
             tr -d '"v, '
@@ -282,7 +282,7 @@ compress_binaries() {
         UPX_ARCH="$ARCH"
     fi
 
-     curl -L -s --output "/tmp/upx.tar.xz" \
+     curl -L -s ${PROXY:+--proxy "$PROXY"} --output "/tmp/upx.tar.xz" \
         "https://github.com/upx/upx/releases/download/v${upx_version}/upx-${upx_version}-${UPX_ARCH}_linux.tar.xz"
 
     # If download fails, skip compression
@@ -482,16 +482,17 @@ invoke_help() {
     echo -e "  \033[93m--no-upx\033[0m             \033[97mDo not compress tailscale with UPX\033[0m"
     echo -e "  \033[93m--no-download\033[0m        \033[97mDo not download tailscale\033[0m"
     echo -e "  \033[93m--no-tiny\033[0m            \033[97mDo not use the tiny version of tailscale\033[0m"
+    echo -e "  \033[93m--proxy\033[0m              \033[97mUse a proxy for curl\033[0m"
     echo -e "  \033[93m--help\033[0m               \033[97mShow this help\033[0m"
 }
 
 invoke_update() {
     log "INFO" "Checking for script updates"
-    SCRIPT_VERSION_NEW=$(curl -s "$UPDATE_URL" | grep -o 'SCRIPT_VERSION="[0-9]\{4\}\.[0-9]\{2\}\.[0-9]\{2\}\.[0-9]\{2\}"' | cut -d '"' -f 2 || echo "Failed to retrieve scriptversion")
+    SCRIPT_VERSION_NEW=$(curl -s ${PROXY:+--proxy "$PROXY"} "$UPDATE_URL" | grep -o 'SCRIPT_VERSION="[0-9]\{4\}\.[0-9]\{2\}\.[0-9]\{2\}\.[0-9]\{2\}"' | cut -d '"' -f 2 || echo "Failed to retrieve scriptversion")
     if [ -n "$SCRIPT_VERSION_NEW" ] && [ "$SCRIPT_VERSION_NEW" != "$SCRIPT_VERSION" ]; then
         log "WARNING" "A new version of the script is available: $SCRIPT_VERSION_NEW"
         log "INFO" "Updating the script ..."
-        curl -L -s --output /tmp/$SCRIPT_NAME "$UPDATE_URL"
+        curl -L -s ${PROXY:+--proxy "$PROXY"} --output /tmp/$SCRIPT_NAME "$UPDATE_URL"
         # Get current script path
         SCRIPT_PATH=$(readlink -f "$0")
         # Replace current script with updated script
@@ -575,6 +576,10 @@ for arg in "$@"; do
     --no-tiny)
         NO_TINY=1
         ;;
+    --proxy)
+      PROXY="$2"
+      shift
+      ;;
     *)
         echo "Unknown argument: $arg"
         invoke_help

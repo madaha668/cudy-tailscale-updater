@@ -12,6 +12,20 @@ REPO="openwrt-tailscale-updater"
 DOWNLOAD_DIR="/tmp/tailscale"
 VERSION_FILE="./version.txt"
 
+# Parse command-line arguments
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --proxy)
+      PROXY="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown argument: $1"
+      exit 1
+      ;;
+  esac
+done
+
 # Step 1: Check prerequisites
 check_prerequisites() {
     echo "Checking prerequisites..."
@@ -42,7 +56,7 @@ get_latest_version() {
     echo "Getting latest version..."
     
     # Get version.txt from latest release
-    DOWNLOAD_URL=$(curl -s -L "https://api.github.com/repos/${OWNER}/${REPO}/releases/latest" | \
+    DOWNLOAD_URL=$(curl -s -L ${PROXY:+--proxy "$PROXY"} "https://api.github.com/repos/${OWNER}/${REPO}/releases/latest" | \
       grep "browser_download_url.*version.txt" | \
       cut -d '"' -f 4)
 
@@ -53,7 +67,7 @@ get_latest_version() {
 
     # Download and extract version
     #echo $DOWNLOAD_URL
-    curl -s -L "$DOWNLOAD_URL" -o $VERSION_FILE
+    curl -s -L ${PROXY:+--proxy "$PROXY"} "$DOWNLOAD_URL" -o $VERSION_FILE
     LATEST_VERSION=$(cat $VERSION_FILE| sed 's/^v//')
     #echo $LATEST_VERSION
     
@@ -116,7 +130,7 @@ check_and_download() {
     mkdir -p "$DOWNLOAD_DIR"
     
     # Get download URL for arm64 binary
-    BINARY_URL=$(curl -s -L "https://api.github.com/repos/${OWNER}/${REPO}/releases/latest" | \
+    BINARY_URL=$(curl -s -L ${PROXY:+--proxy "$PROXY"} "https://api.github.com/repos/${OWNER}/${REPO}/releases/latest" | \
         grep "browser_download_url.*tailscaled-linux-arm64" | \
         cut -d '"' -f 4)
     
@@ -126,7 +140,7 @@ check_and_download() {
     fi
     
     # Download the binary
-    curl -L -s --output "$DOWNLOAD_DIR/tailscaled-linux-arm64" "$BINARY_URL"
+    curl -L -s ${PROXY:+--proxy "$PROXY"} --output "$DOWNLOAD_DIR/tailscaled-linux-arm64" "$BINARY_URL"
     
     if [ ! -f "$DOWNLOAD_DIR/tailscaled-linux-arm64" ]; then
         echo "ERROR: Download failed"
